@@ -11,7 +11,6 @@ function Rooms(){
     
     const username= socket.socket.auth.username;
     const [message, setMessage] = useState('');
-    const [selectedUser, setSelectedUser] = useState(null);
     const [chatMessages,setChatMessages]= useState([]);
     const [userList,setUserList]=useState([]);
     const [connectedUser,setConnectedUser]=useState([]);
@@ -35,7 +34,7 @@ function Rooms(){
         await socket.socket.emit("private-message",{msg:message,sendto:connectTo});
         setTimeout(()=>{
           fetchChat(connectTo);
-        },10);
+        },100);
         
         console.log(connectTo);
       }
@@ -78,17 +77,31 @@ function Rooms(){
 
         setChatMessages((prev)=>[...prev,newMessage])
     });
+  
     
+  const messageCountManage=(user)=>{
+    setConnectedUser((prev)=>{
+      const index = connectedUser.findIndex((us)=>us.name=user);
+      if (index !== -1) {
+        const updatedUsers = [...prev];
+        updatedUsers[index].num =0;
+        return updatedUsers;
+      } else {
+        // If the user doesn't exist, add them to the connected users array
+        return [...prev, { name: user, num: 0 }];
+      }
+
+
+    })
+  }
 
   const handleUserClick = (user) => {
-      if(user===username){
+      if(user==username){
         return
       }
-      const f=connectedUser.find((us=>us==user));
-      if(!f){
-        setConnectedUser((prev)=>[...prev,user]);
-      }
-      
+     messageCountManage(user);
+     
+    
       socket.socket.emit("userChat",user);
       SetConnectTo(user);
 
@@ -108,16 +121,26 @@ function Rooms(){
   
   socket.socket.off("new-message").on("new-message",(username)=>{
     console.log("socket",username);
-    const h=connectedUser.find(user=>user==username);
+    const h=connectedUser.find((user)=>user.name==username);
     if(h){
+      setConnectedUser((prev)=>{
+        const index= connectedUser.findIndex((user)=>user.name==username);
+        const updated=[...prev];
 
-    } 
+        ++updated[index].num;
+        return updated;
+
+      })
+      
+      
+    }
     else{
-      setConnectedUser((prev)=>[...prev,username]);
+      setConnectedUser((prev)=>[...prev,{name:username,num:1}]);
   
     } 
     if(connectTo==username){
       fetchChat(username);
+      messageCountManage(connectTo);
     }
     
   })
@@ -128,8 +151,9 @@ function Rooms(){
   }
 
   function closeChat(user){
+    console.log("hiiuih");
     socket.socket.emit("close-chat",user);
-    const index = connectedUser.findIndex(user);
+    const index = connectedUser.findIndex((us)=>us.name==user);
     if(index>-1){
       connectedUser.splice(index,1);
     }
@@ -149,7 +173,12 @@ function Rooms(){
           <div className="flex flex-col h-full overflow-y-scroll w-full">
             <div className="flex justify-between px-2 py-2 w-full" onClick={chatRoomSelected}>Chat room</div>
            { connectedUser.map((user)=>( 
-              <li key={user} className="cursor-pointer flex justify-between px-2 py-1 w-full" onClick={()=>handleUserClick(user)}>{user} <IoClose className="mt-1" onclick={()=>closeChat(user)}/></li>
+              <li key={user} className="cursor-pointer flex justify-between px-2 py-1 w-full" onClick={()=>handleUserClick(user.name)}>{user.name} 
+                <div className="flex">
+                  <p className="text-large text-black-500 ">{user.num}</p>
+                <IoClose className="mt-1 z-20" onclick={()=>closeChat(user)}/>
+                </div>
+              </li>
               
             ))}
           </div>

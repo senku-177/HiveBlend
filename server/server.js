@@ -7,7 +7,7 @@ const {Server} = require('socket.io');
 const {connectDatabase} = require('./connections/Database');
 const{connectedMap,createTimeout} = require('./connections/serverTimedOut');
 const Users = require('./model/model');
-const {joinRoom, userList, msgRecieve,fetchChat, sendMessage} = require("./connections/room");
+const {joinRoom, userList, msgRecieve,fetchChat, sendMessage, closeChat} = require("./connections/room");
 
 const mongoUrl= "mongodb://127.0.0.1:27017/Chat-app";
 
@@ -120,20 +120,25 @@ io.use((socket, next) => {
       await sendMessage(io,socket,data);
     })
 
+    socket.on("close-chat",async(data)=>{
+      await closeChat(data,socket,io);
+    })
     socket.on('disconnect',async ()=>{
         clearTimeout(timeout);
         
-        entry=await Users.findOne({userid:socket.id});
+        entry=await Users.findOne({userid:socket.id});  
         
 
         if(entry.userConnectedTo){
+          console.log("kiski call ayi");
           console.log(entry.userConnectedTo);
+          const user1=io.sockets.sockets.get(entry.userConnectedTo);
           
-          user1=io.sockets.sockets.get(entry.userConnectedTo);
           await DisconnectCurrentChat(user1);
 
           user1.emit("break");
         }
+
 
         console.log("user disconnected",socket.username);
         await Users.deleteOne({userid:socket.id}).then(()=>{console.log("entry deleted")});
@@ -226,7 +231,7 @@ io.use((socket, next) => {
 
   async function DisconnectCurrentChat(user){
 
-    await Users.findOneAndUpdate({userid:user},{inQueue:true,
+    await Users.findOneAndUpdate({userid:user.id},{inQueue:true,
                                                 userConnectedTo:null},null).then(console.log("disconnected"));
 
 
