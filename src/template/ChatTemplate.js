@@ -1,5 +1,5 @@
 import { useEffect,useRef } from "react";
-
+import './custom-scrollbar.css';
 function ChatTemplate({ chatMessages, username }) {
   console.log(chatMessages);
   const chatContainerRef = useRef(null);
@@ -10,35 +10,36 @@ function ChatTemplate({ chatMessages, username }) {
   }, [chatMessages]);
 
   return (
-    <div className="border p-4 h-full overflow-y-scroll" ref={chatContainerRef}>
-      {chatMessages.map((message, index) => (
+    <div className="p-4 h-full overflow-y-scroll custom-scrollbar" ref={chatContainerRef}>
+    {chatMessages.map((message, index) => (
+      <div
+        key={index}
+        className={`flex items-end mb-4 ${
+          message.sender === username ? "justify-end" : "justify-start"
+        }`}
+      >
         <div
-          key={index}
-          className={`flex items-end mb-2 ${
-            message.sender === username ? "justify-end" : "justify-start"
+          className={`max-w-[80%] px-4 py-2 rounded-lg shadow-lg ${
+            message.sender === username
+              ? "bg-blue-500 text-white"
+              : "bg-gray-700 text-gray-300"
           }`}
         >
-          <div
-            className={`max-w-[80%] px-4 py-2 rounded-lg ${
-              message.sender === "user"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-black"
+          <p
+            className={`capitalize font-bold mb-1 text-sm ${
+              message.sender === username
+                ? "text-yellow-400"
+                : "text-yellow-600"
             }`}
           >
-            <p
-              className={`capitalize font-bold mb-1 text-xs ${
-                message.sender === "user"
-                  ? "text-yellow-400"
-                  : "text-yellow-600"
-              }`}
-            >
-              {message.sender === username ? username : message.sender}
-            </p>
-            <p className="text-lg">{message.content}</p>
-          </div>
+            {message.sender === username ? username : message.sender}
+          </p>
+          <p className="text-lg">{message.content}</p>
         </div>
-      ))}
-    </div>
+      </div>
+    ))}
+  </div>
+  
   );
 }
 

@@ -1,0 +1,16 @@
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px; /* Adjust the width to make the scrollbar smaller */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Adjust the background color to match your website */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888; /* Adjust the background color to match your website */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Adjust the background color to match your website */
+  }
+  
