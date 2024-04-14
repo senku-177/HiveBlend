@@ -21,20 +21,23 @@ function ChatTemplate({ chatMessages, username }) {
         <div
           className={`max-w-[80%] px-4 py-2 rounded-lg shadow-lg ${
             message.sender === username
-              ? "bg-blue-500 text-white"
-              : "bg-gray-700 text-gray-300"
+              ? "bg-gray-900 text-white"
+              : "bg-blue-900 text-white"
           }`}
         >
           <p
             className={`capitalize font-bold mb-1 text-sm ${
               message.sender === username
-                ? "text-yellow-400"
-                : "text-yellow-600"
+                ? "text-blue-200"
+                : "text-pink-600"
             }`}
           >
             {message.sender === username ? username : message.sender}
           </p>
-          <p className="text-lg">{message.content}</p>
+          <p className="text-lg">{message.image?(<a href={message.content}>
+                                                    <p className="mt-1 mb-2">{message.content}</p>
+                                                    <img className='border border-black border-4 rounded-xl 'src={message.content}></img>
+                                                  </a>):message.content}</p>
         </div>
       </div>
     ))}

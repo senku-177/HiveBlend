@@ -19,10 +19,18 @@ useEffect(()=>{
 //recieving a new common room message
 socket.socket.off("room-msg").on("room-msg",(data)=>{
     
+    if(data.image){
+       
+        setGroupMessages((prev)=>[...prev,{sender:data.username,content:data.content,image:data.image}]);
+        return;
+    }
+
     if(data.username==username){
         return;
     }
+    
     const newMessage={sender:data.username, content: data.content};
+
 
     setGroupMessages((prev)=>[...prev,newMessage])
 });
