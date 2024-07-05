@@ -38,7 +38,7 @@ function Home({setConnect}){
         setUsername(event.target.value);
     }
 
-    function roomConnectionHandler(){
+    async function roomConnectionHandler(){
         if(username==""||!username){
             setnoUsername(true);
             return
@@ -49,12 +49,29 @@ function Home({setConnect}){
         console.log(socket);
 
         socket.socket.connect();
-        console.log("user-connected to rooms");
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        socket.socket.emit("connect-room");
-        setConnect(true);
-
-        navigate("/rooms");
+    // Wait for 1 second
+    await delay(1000);
+        console.log(socket.socket);
+        
+        try {
+            const response = await new Promise((resolve, reject) => {
+                socket.socket.emit("connect-room", (response) => {
+                    if (response.status === 'success') {
+                        resolve(response);
+                    } else {
+                        reject(new Error(response.message));
+                    }
+                });
+            });
+    
+            console.log(response.message);
+            setConnect(true);
+            navigate("/rooms");
+        } catch (error) {
+            console.error("Error connecting to room:", error.message);
+        }
 
     }
 

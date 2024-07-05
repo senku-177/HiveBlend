@@ -8,7 +8,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:9000', { autoConnect: false }); // Replace with your server URL
+    const newSocket = io('https://hiveblend-backend.onrender.com', { autoConnect: false }); // Replace with your server URL
     console.log(newSocket);
     setSocket(newSocket);
     

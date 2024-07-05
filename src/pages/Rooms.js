@@ -22,6 +22,7 @@ function Rooms(){
         const [privateChats,setPrivateChats]=useState([]);
 
       // room message send
+
       const handleMessageSendRoom = async()=>{
           if(!message||message==""){
             return 
@@ -138,6 +139,10 @@ function Rooms(){
       }
     }
 
+      socket.socket.off("room-connected").on("room-connected",()=>{
+        console.log("room connected");
+      })
+      
       socket.socket.off("userChat").on("userChat",(chat)=>{
         setPrivateChats(chat);
 
